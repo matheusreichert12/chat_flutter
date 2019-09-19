@@ -167,9 +167,14 @@ class _TextComposerState extends State<TextComposer> {
                   File imgFile =
                       await ImagePicker.pickImage(source: ImageSource.camera);
                   if (imgFile == null) return;
-                  FirebaseStorage.instance.ref().child(
-                      googleSignIn.currentUser.id.toString() +
-                          DateTime.now().millisecondsSinceEpoch.toString());
+                  StorageUploadTask task = FirebaseStorage.instance
+                      .ref()
+                      .child(googleSignIn.currentUser.id.toString() +
+                          DateTime.now().millisecondsSinceEpoch.toString())
+                      .putFile(imgFile);
+                  StorageTaskSnapshot taskSnapshot = await task.onComplete;
+                  String url = await taskSnapshot.ref.getDownloadURL();
+                  _sendMessage(imgUrl: url);
                 },
               ),
             ),
